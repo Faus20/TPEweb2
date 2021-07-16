@@ -8,7 +8,7 @@ class PaisesModel extends Model{
      * 
      * Retorna todos los paises almacenados en la tabla paises
      */
-    public function getAll() {
+    public function obtenerTodos() {
         $query = $this->getDb()->prepare('SELECT * FROM paises ORDER BY nombre ASC');
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
@@ -19,7 +19,7 @@ class PaisesModel extends Model{
      * return array
      * Retorna toda la info de un pais que coincida con el id.
      */
-    public function get($id) {
+    public function obtener($id) {
         $query = $this->getDb()->prepare('SELECT * FROM paises WHERE id = ?');
         $query->execute(array($id));
 
@@ -30,10 +30,22 @@ class PaisesModel extends Model{
      * @param $nombre $id
      * Edita un pais en base al nombre y el id pasado por parámetro
      */
-    public function edit($id, $nombre){
+    public function editar($id, $nombre){
         $query = $this->getDb()->prepare('UPDATE paises SET nombre = ? WHERE id = ?');
         $query->execute([$nombre, $id]);
     }
+
+ /**
+     * @param $nombre
+     * Retorna toda la info de un pais si coincide con lo pasado por parametro.
+     */
+    public function obtenerPais($nombre)
+    {
+        $query = $this->getDb()->prepare('SELECT * FROM `paises` WHERE nombre = ?');
+        $query->execute(array(($nombre)));
+        return $query->fetch(PDO::FETCH_OBJ);
+    }
+
 
     /**
      * @param $nombre

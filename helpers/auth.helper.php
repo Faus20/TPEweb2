@@ -17,6 +17,9 @@ class AuthHelper {
         $_SESSION['IS_LOGGED'] = true;
         $_SESSION['ID_USER'] = $user->id;
         $_SESSION['USERNAME'] = $user->nombre;
+        if ($user->admin == 2) {
+            $_SESSION['ADMIN'] = 2;
+        } else $_SESSION['ADMIN'] = 1;
     }
 
     //destruye la sesion.
@@ -25,13 +28,27 @@ class AuthHelper {
         session_destroy();
     }
 
-    //obtengo el nombre del usuario loggeado.
-    public static function getLoggedUserName() {
+    //obtengo nombre usuarix loggeadx.
+    public static function obtenerNombreUsuarix() {
         self::start();
         if (isset($_SESSION['USERNAME'])) {
             return $_SESSION['USERNAME'];
         } else {
             return false;
+        }
+    }
+
+    //obtengo si usurix es admin
+    public static function obtenerUsuarixAdmin() {
+        self::start();
+        if (isset($_SESSION['ADMIN'])) {
+            if ($_SESSION['ADMIN'] == 2) {
+                return 2;
+            } else {
+                return 1;
+            }
+        } else {
+            return 0;
         }
     }
 

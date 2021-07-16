@@ -3,8 +3,10 @@ require_once('models/destinos.model.php');
 require_once('views/view.php');
 require_once('views/view.destinos.paises.php');
 require_once('models/paises.model.php');
+include_once('helpers/auth.helper.php');
 
-class DestinosController {
+class DestinosController
+{
 
     private $modeldestinos;
     private $view;
@@ -12,112 +14,174 @@ class DestinosController {
 
     //En el constructor hago las conecciones a las 2 bases de datos y
     //a la vista para poder usarlas dentro de esta clase.
-    public function __construct(){
+    public function __construct()
+    {
         $this->modeldestinos = new DestinosModel();
         $this->modelpaises = new PaisesModel();
         $this->view = new DestinosPaisesView();
     }
 
-    //funcion para mostrar home
-    public function showHome(){
-        $this->view->home();
-        
-    }
-    
-    //obtengo todos los paises y los destinos de la base de datos y
-    //se los mando a la vista para mostrarlos.
-    public function showAllDestinos(){
-        $paises = $this->modelpaises->getAll();
-        $destinos = $this->modeldestinos->getAll();
+    //funcion para mostrar pagina
+    public function mostrarHome()
+    {
+        $paises = $this->modelpaises->obtenerTodos();
+        $destinos = $this->modeldestinos->obtenerTodos();
 
         $this->view->destinos($paises, $destinos);
     }
 
     //obtengo todo la info de un destino en particular a partir de la id.
-    public function showDetail($id){
-        $destino = $this->modeldestinos->get($id);
-        $paises = $this->modelpaises->getAll();
-        
+    public function mostrarDetalle($id)
+    {
+        $destino = $this->modeldestinos->obtener($id);
+        $paises = $this->modelpaises->obtenerTodos();
+
         $this->view->detalle($destino, $paises);
     }
 
     //obtengo todos los destinos pertenecientes a un mismo pais y los muestro.
-    public function showDestinos($id){
-        $paises = $this->modelpaises->getAll();
-        $destinos = $this->modeldestinos->getbyID($id);
+    public function mostrarDestinosPorPais()
+    {
+        $id = $_POST["pais"];
+
+        $paises = $this->modelpaises->obtenerTodos();
+        if ($id == "todos") {
+            $destinos = $this->modeldestinos->obtenerTodos();
+        } else {
+            $destinos = $this->modeldestinos->obtenerTodosId($id);
+        }
 
         $this->view->destinos($paises, $destinos);
     }
 
-    //funcion para mostrar pagina de admin
-    public function showAdmin(){
-        $paises = $this->modelpaises->getAll();
-        $destinos = $this->modeldestinos->getAll();
+    //obtengo todos los destinos que coincidan con lo ingresado por usuarix
+    public function mostrarDestinosPorNombre()
+    {
+        $nombre = $_POST["busqueda"];
 
-        $this->view->admin($paises, $destinos);
+        $paises = $this->modelpaises->obtenerTodos();
+        $destinos = $this->modeldestinos->obtenerPorNombre($nombre);
+
+        $this->view->destinos($paises, $destinos);
     }
 
-   //funcion para mostrar el formulario de editar con la info de la base de datos precargada
-   //con el id pasado por parametro (cuando aprieto el boton de la tarjeta)
-   public function ShowEditar($id, $error=null){
-   
-    if (!empty($_POST['destino'])) {
-        $id = $_POST['destino'];
-    } 
+    //Obtengo los destinos ordenas de una determinada forma dependiendo lo elegido por usuarix
+    public function mostrarDestinosPorPrecio()
+    {
+        $precio = $_POST["precio"];
 
-    $destino = $this->modeldestinos->get($id);
-    
-    $this->view->ShowEditDestinos($destino, $error);
+        $paises = $this->modelpaises->obtenerTodos();
+
+        if ($precio == "menor") {
+            $destinos =  $this->modeldestinos->obtenerPorPrecioMenor();
+        } else {
+            $destinos =  $this->modeldestinos->obtenerPorPrecioMayor();
+        }
+
+        $this->view->destinos($paises, $destinos);
     }
 
-    //funcion para editar un destino,si esta vacio el nombre, vuelve a mostrar el formulario con un
-    //mensaje de error
-    public function editar(){
-        $id = $_POST['destino'];
-        $nombre = $_POST['name'];
-        $detail = $_POST['detail'];
-        $precio = $_POST['precio'];
-        $dias = $_POST['dias'];
+    //funcion para mostrar el formulario de editar con la info de la base de datos precargada
+    public function mostrarEditar($id, $error = null)
+    {
+        if (AuthHelper::obtenerUsuarixAdmin() == 2) {
+            $destino = $this->modeldestinos->obtener($id);
 
- 
-        if(!empty($nombre) && !empty($detail) && !empty($precio) && !empty($dias)) {
-            $this->modeldestinos->edit($id, $nombre, $detail, $precio, $dias);
-           
-            header("Location: " . BASE_URL . 'destinos');
-        } else
-            $this->ShowEditar($id, "Error, campos vacios");
+            $this->view->mostrarEditarDestinos($destino, $error);
+        } else {
+            $this->view->mostrarError("Acceso denegado");
+        }
+    }
+
+    //funcion para editar un destino con lo ingresado en el formulario.
+    public function editar()
+    {
+        if (AuthHelper::obtenerUsuarixAdmin() == 2) {
+
+            $id = $_POST['destino'];
+            $nombre = $_POST['name'];
+            $detail = $_POST['detail'];
+            $precio = $_POST['precio'];
+            $dias = $_POST['dias'];
+
+            if (!empty($nombre) && !empty($detail) && !empty($precio) && !empty($dias)) {
+                if (($_FILES['imagen']['type'] == "image/jpg" ||
+                    $_FILES['imagen']['type'] == "image/jpeg" ||
+                    $_FILES['imagen']['type'] == "image/png")) {
+                    $this->modeldestinos->editar($id, $nombre, $detail, $precio, $dias, $_FILES['imagen']['type']);
+                } else {
+                    $this->modeldestinos->editarSinImagen($id, $nombre, $detail, $precio, $dias);
+                }
+                header("Location: " . BASE_URL . 'home');
+            } else
+                $this->mostrarEditar($id, "Error, campos vacios");
+        } else {
+            $this->view->mostrarError("Acceso denegado");
+        }
+    }
+
+    //funcion para mostrar el formulario para agregar un destino
+    public function mostrarAgregar($error = null)
+    {
+        $paises = $this->modelpaises->obtenerTodos();
+
+        $this->view->mostrarAgregar($paises, $error);
     }
 
     //funcion para agregar un destino con toda la info que esta en el form de admin.
-    public function agregar(){
-        $pais = $_POST['pais'];
-        $nombre = $_POST['name'];
-        $detail = $_POST['detail'];
-        $precio = $_POST['precio'];
-        $dias = $_POST['dias'];
+    public function agregar()
+    {
+        if (AuthHelper::obtenerUsuarixAdmin() == 2) {
+            $pais = $_POST['pais'];
+            $nombre = $_POST['name'];
+            $detail = $_POST['detail'];
+            $precio = $_POST['precio'];
+            $dias = $_POST['dias'];
 
-        //chequeo que ningun imput este vacio y despues si lo agrego
-        if(!empty($nombre) && !empty($detail) && !empty($precio) && !empty($dias)){
-            $this->modeldestinos->agregar($pais, $nombre, $detail, $precio, $dias);
-            header("Location: " . BASE_URL . 'destinos');
-        } else  $this->view->showError("No es posible agregar elementos vacios");
+            //chequeo que ningun imput este vacio y despues si lo agrego
+            if (!empty($nombre) && !empty($detail) && !empty($precio) && !empty($dias)) {
+
+                if (($_FILES['imagen']['type'] == "image/jpg" ||
+                    $_FILES['imagen']['type'] == "image/jpeg" ||
+                    $_FILES['imagen']['type'] == "image/png")) {
+                    $this->modeldestinos->agregar($pais, $nombre, $detail, $precio, $dias, $_FILES['imagen']['type']);
+                } else {
+                    $this->modeldestinos->agregar($pais, $nombre, $detail, $precio, $dias);
+                }
+                header("Location: " . BASE_URL . 'home');
+            } else  $this->mostrarAgregar("Error, campos vacios");
+        } else {
+            $this->view->mostrarError("Acceso denegado");
+        }
     }
 
     //funcion para eliminar un destino que coincida con el id pasado por parametro 
-    //(cuando aprieto el boton que esta en cada tarjeta)
-    public function eliminar($id){
+    public function eliminar($id)
+    {
+        if (AuthHelper::obtenerUsuarixAdmin() == 2) {
 
-        //si lo quiero eliminar desde la pagina de admin, el id se toma desde ahi.
-        if (!empty($_POST['destino'])) {
-            $id = $_POST['destino'];
-        } 
+            $this->modeldestinos->eliminar($id);
+            header("Location: " . BASE_URL . 'home');
+        } else {
+            $this->view->mostrarError("Acceso denegado");
+        }
+    }
 
-        $this->modeldestinos->eliminar($id);
-        header("Location: " . BASE_URL . 'destinos');
+    //funcion para eliminar una portada que coincida con el id pasado por parametro 
+    public function eliminarPortada($id)
+    {
+        if (AuthHelper::obtenerUsuarixAdmin() == 2) {
+
+            $this->modeldestinos->eliminarPortada($id);
+            header("Location: " . BASE_URL . 'home');
+        } else {
+            $this->view->mostrarError("Acceso denegado");
+        }
     }
 
     //Funcion para mostrar errores generales
-    public function showError($msg){
-        $this->view->showError($msg);
+    public function mostrarError($msg)
+    {
+        $this->view->mostrarError($msg);
     }
 }

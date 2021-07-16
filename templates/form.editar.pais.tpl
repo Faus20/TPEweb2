@@ -1,33 +1,41 @@
 {include file="header.tpl"}
-<div class="encabezado">
-    {include file="nav.tpl"}
-</div>
-<div class="container_form_edit">
+{include file="nav.tpl"}
 
-    <div class="formulario">
-        <form method="POST" action="editarPais">
-            <div class="titulo_formulario">
-                Editando {$pais->nombre}
-            </div>
-            <div class="fila_formulario">
-                <label for="pais"> Pais a editar: </label>
-                <select name="pais">
-                    <option value="{$pais->id}">{$pais->nombre}</option>
-                </select>
-            </div>
-            <div class="fila_formulario">
-                <label for="name"> Nuevo nombre: </label>
-                <input type="text" id="name" name="name" value="{$pais->nombre}">
-            </div>
-            <div class="fila_formulario">
-                <input type="submit" name="editar" value="Editar">
-            </div>
-            {if $error}
-                <div class="error">
-                    *{$error}
-                </div>
-            {/if}
-        </form>
+<h1 class="text-center destino_detalle">Editar Pais</h1>
+<div class="row">
+    <div class="col-1 editando">
+        <p>EDITAR</p>
+    </div>
+    <div class="col-11 ">
+        <div class="formulario">
+            <form method="POST" action="editarPais">
+                {if $error}
+                    <div class="col-12 bg-danger text-center text-light p-3">
+                        *{$error}
+                    </div>
+                {/if}
+                <div class="row justify-content-md-center">
+                    <div class="col-4">
+                        <label for="pais"> <span>Pais a editar:</span> </label>
+                        <select class="form-control" name="pais">
+                            <option value="{$pais->id}">{$pais->nombre}</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <label for="name"> <span>Nuevo nombre:</span> </label>
+                        <input class="form-control" type="text" id="name" name="name" value="{$pais->nombre}">
+                    </div>
+                    <div class="row justify-content-md-center m-2">
+                        <div class="col-1">
+                            <input class="btn btn-warning text-light" type="submit" name="agregar" value="Editar">
+                        </div>
+                        <div class="col-1">
+                        <a class="btn btn-danger" href="home">Cancelar</a>
+                        </div>
+                    </div>
+            </form>
+        </div>
     </div>
 </div>
+
 {include file="footer.tpl"}

@@ -1,41 +1,66 @@
-<div class="container_formulario">
+{include file="header.tpl"}
 
-    <div class="formulario">
-        <form method="POST" action="agregarDestino">
-            <div class="titulo_formulario">
-                Cargar destino
-            </div>
-
-            <div class="fila_formulario">
-                <label for="name"> Nombre </label>
-                <input type="text" id="name" name="name" value="">
-            </div>
-            <div class="fila_formulario">
-                <label for="destino"> Pais:: </label>
-                <select name="pais">
+{include file="nav.tpl"}
+<h1 class="text-center destino_detalle">Nuevo Destino</h1>
+<div class="row">
+    <div class="col-1 editando">
+        <p>AGREGAR</p>
+    </div>
+    <div class="col-11 ">
+        <div class="formulario">
+            <form method="POST" action="agregarDestino" enctype="multipart/form-data">
+            {if $error}
+                <div class="col-12 bg-danger text-center text-light p-3">
+                    *{$error}
+                </div>
+            {/if}
+                <div class="row justify-content-md-center ">
+                <div class="col-4 m-1">
+                <label for="name"> <span>Nombre:</span> </label>
+                <input class="form-control" type="text" id="name" name="name">
+                </div>
+                <div class="col-4 m-1">
+                    <label for="destino"> <span>Pais:</span> </label>
+                    <select class="form-control" name="pais">
                     {foreach from=$paises item=pais}
                         <option value="{$pais->id}">{$pais->nombre}</option>
                     {/foreach}
                 </select>
-            </div>
-            <div class="fila_formulario">
-                <label for="dias">Dias: </label>
-                <input type="number" id="number" name="dias" value="">
-            </div>
-            <div class="fila_formulario">
-                <label for="precio">Precio: </label>
-                <input type="number" step="any" id="number" name="precio" value="">
-            </div>
-            <div class="fila_formulario">
-                <label for="detail"> Detalles: </label>
-            </div>
-            <div class="fila_formulario">
-                <textarea name="detail" cols="30" rows="10" placeholder="Especifique detalles del destino"></textarea>
-            </div>
-            <div class="fila_formulario">
-                <input type="submit" name="agregar" value="Cargar">
-            </div>
-        </form>
+                </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-4 m-1">
+                        <label for="dias"><span>Dias:</span> </label>
+                        <input class="form-control" type="number" id="number" name="dias" >
+                    </div>
+                    <div class="col-4 m-1">
+                        <label for="precio"><span>Precio:</span> </label>
+                        <input class="form-control" type="number" step="any" id="number" name="precio">
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                <div class="col-8 m-1">
+                    <label for="imagen"> <span>Subir imagen:</span> </label>
+                    <input class="form-control" type="file" step="any" id="imageToUpload" name="imagen">
+                    </div>
+                 </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-4 m-1">
+                        <label for="detail"> <span>Detalles:</span> </label>
+                        <textarea class="form-control" name="detail" cols="30" rows="10" placeholder="Especifique detalles del destino"></textarea>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-1 m-1">
+                        <input class="btn btn-warning text-light" type="submit" name="agregar" value="Agregar">
+                    </div>
+                    <div class="col-1 m-1" >
+                        <a class="btn btn-danger" href="home">Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-
 </div>
+
+{include file="footer.tpl"}

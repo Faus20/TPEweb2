@@ -7,27 +7,14 @@ class DestinosPaisesView extends View{
 
     public function __construct() {
         parent::__construct();
-        $authHelper = new AuthHelper();
-        $username = $authHelper->getLoggedUserName();
-        $this->getSmarty()->assign('username', $username);
-        
-    }
-
-    //Funcion para mostrar el home
-    public function home(){  
-        $this->getSmarty()->assign('title','Home');
-        
-        //llamo al template a mostrar al usuarix.
-        $this->getSmarty()->display('templates/home.tpl');
     }
 
     //funcion para mostrar la pagina de destinos
     public function destinos($paises, $destinos){
         
-        $this->getSmarty()->assign('title','Destinos');
+        $this->getSmarty()->assign('title','Home');
         $this->getSmarty()->assign('paises', $paises);
         $this->getSmarty()->assign('destinos', $destinos);
-
         //llamo al template a mostrar al usuarix.
         $this->getSmarty()->display('templates/destinos.tpl');
     }
@@ -35,24 +22,35 @@ class DestinosPaisesView extends View{
     //funcion para mostrar el detalle de un destino en particular
     public function detalle($destino, $paises){
         
+        
         $this->getSmarty()->assign('title','Detalle');
-        $this->getSmarty()->assign('paises', $paises);
         $this->getSmarty()->assign('destino', $destino);    
+        $this->getSmarty()->assign('paises', $paises);
         
         $this->getSmarty()->display('templates/detalle.tpl');
     }
 
     //funcion para mostrar la pagina de admin
-    public function admin($paises, $destino){
+    public function mostrarAgregar($paises, $error=null){
         
         $this->getSmarty()->assign('title','Admin');
         $this->getSmarty()->assign('paises', $paises);
-        $this->getSmarty()->assign('destinos', $destino);
-        $this->getSmarty()->display('templates/admin.tpl');
+        $this->getSmarty()->assign('error', $error);
+        
+        $this->getSmarty()->display('templates/agregar.destino.tpl');
+    }
+
+     //funcion para mostrar la pagina de admin
+     public function mostrarAgregarPais($error=null){
+        
+        $this->getSmarty()->assign('title','Admin');
+        $this->getSmarty()->assign('error', $error);
+        
+        $this->getSmarty()->display('templates/agregar.pais.tpl');
     }
 
     //funcion para mostrar la pagina de editar pais
-    public function ShowEditPais($pais, $error=null){
+    public function mostrarEditarPais($pais, $error=null){
      
         $this->getSmarty()->assign('title','Edit');
         $this->getSmarty()->assign('pais', $pais);
@@ -62,7 +60,7 @@ class DestinosPaisesView extends View{
     }
 
     //funcion para mostrar la pagina de editar destino
-    public function ShowEditDestinos($destino, $error=null){
+    public function mostrarEditarDestinos($destino, $error=null){
       
         $this->getSmarty()->assign('title','Edit');
         $this->getSmarty()->assign('destino', $destino);
@@ -73,11 +71,11 @@ class DestinosPaisesView extends View{
 
     //creo una funcion general para mostrar errores, y recibo un mensaje por parametro
     //para poder utilizarla muchas veces en diferentes casos.
-    public function showError($error){
-        $this->getSmarty()->assign('error', "Error");
+    public function mostrarError($error){
+        $this->getSmarty()->assign('title','Error');
         $this->getSmarty()->assign('subtitle', $error);
       
-        $this->getSmarty()->display('templates/showError.tpl');
+        $this->getSmarty()->display('templates/mostrar.error.tpl');
     }
 
 
