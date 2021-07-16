@@ -29,6 +29,9 @@ class UserController {
         
         if (!empty($user) && !empty($pass)) {
             $this->model->add($user, $pass);
+            
+            $userDb = $this->model->getUserByUsername($user);
+            AuthHelper::login($userDb);
             header("Location: " . BASE_URL . 'home');
         } else {
             $this->view->mostrarRegistrar("User o Password incompleto");
